@@ -67,11 +67,6 @@ build {
     "source.amazon-ebs.custom-ami"
   ]
 
-  provisioner "file" {
-    source      = "custom-motd-banner"
-    destination = "/tmp/custom-motd-banner"
-  }
-
   provisioner "shell" {
     inline = [
       "sudo useradd daveops",
