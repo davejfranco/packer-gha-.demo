@@ -1,0 +1,42 @@
+#github workflow to build an AMI using packer
+---
+name: Packer build
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  release-ami:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Connect to AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-session-name: ${{ github.sha }}
+          role-to-assume: ${{ secrets.AWS_IAM_PACKER_ROLE }}
+          aws-region: us-east-1
+
+      - name: Packer build 
+        run: |
+          packer init .
+          packer build \
+            -var "ami_name=$AMI_NAME" \
+            -var "vpc_id=$VPC_ID" \
+            -var "subnet_id=$SUBNET_ID" \
+            -var "ssh_public_key=$SSH_PUBLIC_KEY" custom-ami.pkr.hcl
+        env:
+          AMI_NAME="custom-ami-${{ github.ref_name }}"
+          VPC_ID=${{ secrets.AWS_VPC_ID }}
+          SUBNET_ID=${{ secrets.AWS_SUBNET_ID }}
+          SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}
