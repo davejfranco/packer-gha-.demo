@@ -31,12 +31,12 @@ jobs:
         run: |
           packer init .
           packer build \
-            -var "ami_name=custom-ami-$AMI_NAME" \
+            -var "ami_name=custom-ami-$AMI_VERSION" \
             -var "vpc_id=$VPC_ID" \
             -var "subnet_id=$SUBNET_ID" \
             -var "ssh_public_key=$SSH_PUBLIC_KEY" custom-ami.pkr.hcl
         env:
-          AMI_NAME=${{ github.ref_name }}
-          VPC_ID=${{ secrets.AWS_VPC_ID }}
-          SUBNET_ID=${{ secrets.AWS_SUBNET_ID }}
-          SSH_PUBLIC_KEY=${{ secrets.SSH_PUBLIC_KEY }}
+          AMI_VERSION: ${{ github.ref_name }}
+          VPC_ID: ${{ secrets.AWS_VPC_ID }}
+          SUBNET_ID: ${{ secrets.AWS_SUBNET_ID }}
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
